@@ -1,5 +1,6 @@
 using System;
 using System.Net.Sockets;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -29,10 +30,10 @@ public class WebcamController : MonoBehaviour
         client = new TcpClient(host, port);
         stream = client.GetStream();
 
-        InvokeRepeating("CaptureAndSendImage", 1.0f, 1.0f);
+        InvokeRepeating("CaptureAndSendData", 1.0f, 1.0f);
     }
 
-    void CaptureAndSendImage()
+    void CaptureAndSendData()
     {
         texture2D.SetPixels(webcamTexture.GetPixels());
         texture2D.Apply();
@@ -50,6 +51,26 @@ public class WebcamController : MonoBehaviour
         stream.Write(sendBytes, 0, sendBytes.Length);
 
         Debug.Log("Image sent. Length: " + imageBytes.Length);
+
+        // Wait for a response from the server
+        byte[] responseLengthBytes = new byte[sizeof(int)];
+        int bytesRead = stream.Read(responseLengthBytes, 0, responseLengthBytes.Length);
+        if (bytesRead == responseLengthBytes.Length)
+        {
+            int responseLength = BitConverter.ToInt32(responseLengthBytes, 0);
+            byte[] responseBytes = new byte[responseLength];
+            bytesRead = 0;
+            while (bytesRead < responseLength)
+            {
+                bytesRead += stream.Read(responseBytes, bytesRead, responseLength - bytesRead);
+            }
+            string responseString = Encoding.UTF8.GetString(responseBytes);
+            Debug.Log("Response received. Length: " + responseLength + ", Message: " + responseString);
+        }
+        else
+        {
+            Debug.Log("Error receiving response from server");
+        }
     }
 
     void OnApplicationQuit()
