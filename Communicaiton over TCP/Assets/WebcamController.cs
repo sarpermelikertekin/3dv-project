@@ -1,6 +1,6 @@
 using System;
 using System.Net.Sockets;
-using System.Text;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,6 +18,9 @@ public class WebcamController : MonoBehaviour
     private TcpClient client;
     private NetworkStream stream;
 
+    private bool isWaitingForResponse = false;
+    private string response;
+
     void Start()
     {
         webcamTexture = new WebCamTexture();
@@ -30,47 +33,55 @@ public class WebcamController : MonoBehaviour
         client = new TcpClient(host, port);
         stream = client.GetStream();
 
-        InvokeRepeating("CaptureAndSendData", 1.0f, 1.0f);
+        StartCoroutine(CaptureAndSendImage());
     }
 
-    void CaptureAndSendData()
+    IEnumerator CaptureAndSendImage()
     {
-        texture2D.SetPixels(webcamTexture.GetPixels());
-        texture2D.Apply();
-
-        // Encode the texture as a PNG image
-        byte[] imageBytes = texture2D.EncodeToPNG();
-
-        // Prepend the length of the image data as a 4-byte integer
-        byte[] lengthBytes = BitConverter.GetBytes(imageBytes.Length);
-        byte[] sendBytes = new byte[lengthBytes.Length + imageBytes.Length];
-        lengthBytes.CopyTo(sendBytes, 0);
-        imageBytes.CopyTo(sendBytes, lengthBytes.Length);
-
-        // Send the length-prefixed image data over the network
-        stream.Write(sendBytes, 0, sendBytes.Length);
-
-        Debug.Log("Image sent. Length: " + imageBytes.Length);
-
-        // Wait for a response from the server
-        byte[] responseLengthBytes = new byte[sizeof(int)];
-        int bytesRead = stream.Read(responseLengthBytes, 0, responseLengthBytes.Length);
-        if (bytesRead == responseLengthBytes.Length)
+        while (true)
         {
-            int responseLength = BitConverter.ToInt32(responseLengthBytes, 0);
-            byte[] responseBytes = new byte[responseLength];
-            bytesRead = 0;
-            while (bytesRead < responseLength)
+            if (!isWaitingForResponse)
             {
-                bytesRead += stream.Read(responseBytes, bytesRead, responseLength - bytesRead);
+                texture2D.SetPixels(webcamTexture.GetPixels());
+                texture2D.Apply();
+
+                // Encode the texture as a PNG image
+                byte[] imageBytes = texture2D.EncodeToPNG();
+
+                // Prepend the length of the image data as a 4-byte integer
+                byte[] lengthBytes = BitConverter.GetBytes(imageBytes.Length);
+                byte[] sendBytes = new byte[lengthBytes.Length + imageBytes.Length];
+                lengthBytes.CopyTo(sendBytes, 0);
+                imageBytes.CopyTo(sendBytes, lengthBytes.Length);
+
+                // Send the length-prefixed image data over the network
+                stream.Write(sendBytes, 0, sendBytes.Length);
+
+                Debug.Log("Image sent. Length: " + imageBytes.Length);
+
+                // Wait for a response from the server
+                isWaitingForResponse = true;
+                yield return StartCoroutine(WaitForResponse());
             }
-            string responseString = Encoding.UTF8.GetString(responseBytes);
-            Debug.Log("Response received. Length: " + responseLength + ", Message: " + responseString);
+            yield return null;
         }
-        else
+    }
+
+    IEnumerator WaitForResponse()
+    {
+        byte[] responseBytes = new byte[1024];
+        int bytesRead = 0;
+        while (bytesRead == 0)
         {
-            Debug.Log("Error receiving response from server");
+            if (stream.DataAvailable)
+            {
+                bytesRead = stream.Read(responseBytes, 0, responseBytes.Length);
+                response = System.Text.Encoding.ASCII.GetString(responseBytes, 0, bytesRead);
+            }
+            yield return null;
         }
+        isWaitingForResponse = false;
+        Debug.Log("Response received: " + response);
     }
 
     void OnApplicationQuit()
