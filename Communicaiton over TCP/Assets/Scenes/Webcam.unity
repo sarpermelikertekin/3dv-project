@@ -562,6 +562,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2013569682}
   - component: {fileID: 2013569683}
+  - component: {fileID: 2013569684}
   m_Layer: 0
   m_Name: WebcamDisplay
   m_TagString: Untagged
@@ -601,3 +602,18 @@ MonoBehaviour:
   sendOnlyImage: 1
   host: 127.0.0.1
   port: 5000
+--- !u!114 &2013569684
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2013569680}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf92397093ba9bf4c95b62d10aad587b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  host: 127.0.0.1
+  port: 5000
+  message: hello world
