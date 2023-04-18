@@ -1,3 +1,4 @@
+using System;
 using System.Net.Sockets;
 using UnityEngine;
 using UnityEngine.UI;
@@ -36,20 +37,19 @@ public class WebcamController : MonoBehaviour
         texture2D.SetPixels(webcamTexture.GetPixels());
         texture2D.Apply();
 
-        if (sendOnlyImage)
-        {
-            // Encode the texture as a PNG image
-            byte[] imageBytes = texture2D.EncodeToPNG();
+        // Encode the texture as a PNG image
+        byte[] imageBytes = texture2D.EncodeToPNG();
 
-            // Send the image data over the network
-            stream.Write(imageBytes, 0, imageBytes.Length);
-        }
-        else
-        {
-            rawImage.texture = texture2D;
-        }
+        // Prepend the length of the image data as a 4-byte integer
+        byte[] lengthBytes = BitConverter.GetBytes(imageBytes.Length);
+        byte[] sendBytes = new byte[lengthBytes.Length + imageBytes.Length];
+        lengthBytes.CopyTo(sendBytes, 0);
+        imageBytes.CopyTo(sendBytes, lengthBytes.Length);
 
-        Debug.Log("Image sent. Length: " + texture2D.EncodeToPNG().Length);
+        // Send the length-prefixed image data over the network
+        stream.Write(sendBytes, 0, sendBytes.Length);
+
+        Debug.Log("Image sent. Length: " + imageBytes.Length);
     }
 
     void OnApplicationQuit()
