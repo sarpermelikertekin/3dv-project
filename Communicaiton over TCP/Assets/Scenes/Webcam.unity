@@ -598,6 +598,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rawImage: {fileID: 1802276489}
-  sendOnlyImage: 0
+  sendOnlyImage: 1
   host: 127.0.0.1
   port: 5000

@@ -1,136 +1,60 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System;
-using System.Net;
 using System.Net.Sockets;
-using System.Threading;
-using System.Runtime.InteropServices;
-using System.IO;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class WebcamController : MonoBehaviour
 {
-    private WebCamTexture webcamTexture;
     public RawImage rawImage;
-
     public bool sendOnlyImage;
-    private Texture2D textureToSend;
 
-    // TCP communication variables
-    private TcpListener listener;
+    private WebCamTexture webcamTexture;
+    private Texture2D texture2D;
+
+    public string host = "127.0.0.1";
+    public int port = 5000;
+
     private TcpClient client;
     private NetworkStream stream;
-    private bool isTcpConnected = false;
 
-    // Start is called before the first frame update
     void Start()
     {
-        // get the default webcam texture
         webcamTexture = new WebCamTexture();
-
-        // start the camera
+        rawImage.texture = webcamTexture;
+        rawImage.material.mainTexture = webcamTexture;
         webcamTexture.Play();
 
-        // set the texture on the rawimage
-        rawImage.texture = webcamTexture;
+        texture2D = new Texture2D(webcamTexture.width, webcamTexture.height);
 
-        // initialize the TCP communication
-        listener = new TcpListener(IPAddress.Any, 9999);
-        listener.Start();
-        Debug.Log("TCP server started");
+        client = new TcpClient(host, port);
+        stream = client.GetStream();
 
-        // start listening for incoming connections
-        Thread listenThread = new Thread(new ThreadStart(ListenForClient));
-        listenThread.Start();
+        InvokeRepeating("CaptureAndSendImage", 1.0f, 1.0f);
     }
 
-    // Update is called once per frame
-    void Update()
+    void CaptureAndSendImage()
     {
-        // capture a frame every 1 second and send it to python
+        texture2D.SetPixels(webcamTexture.GetPixels());
+        texture2D.Apply();
+
         if (sendOnlyImage)
         {
-            if (textureToSend == null)
-            {
-                textureToSend = new Texture2D(webcamTexture.width, webcamTexture.height);
-            }
+            // Encode the texture as a PNG image
+            byte[] imageBytes = texture2D.EncodeToPNG();
 
-            textureToSend.SetPixels(webcamTexture.GetPixels());
-            textureToSend.Apply();
-            byte[] imageData = textureToSend.EncodeToJPG();
-            Debug.Log("Sending image of size " + imageData.Length);
-
-            if (isTcpConnected)
-            {
-                try
-                {
-                    stream.Write(imageData, 0, imageData.Length);
-                }
-                catch (Exception e)
-                {
-                    Debug.Log("Error sending image: " + e);
-                }
-            }
+            // Send the image data over the network
+            stream.Write(imageBytes, 0, imageBytes.Length);
         }
+        else
+        {
+            rawImage.texture = texture2D;
+        }
+
+        Debug.Log("Image sent. Length: " + texture2D.EncodeToPNG().Length);
     }
 
-    void OnDestroy()
+    void OnApplicationQuit()
     {
-        // release the resources
-        if (webcamTexture != null)
-        {
-            webcamTexture.Stop();
-        }
-
-        if (isTcpConnected)
-        {
-            stream.Close();
-            client.Close();
-            listener.Stop();
-        }
-    }
-
-    private void ListenForClient()
-    {
-        try
-        {
-            client = listener.AcceptTcpClient();
-            Debug.Log("TCP client connected");
-            stream = client.GetStream();
-            isTcpConnected = true;
-
-            // start receiving messages from the client
-            Thread receiveThread = new Thread(new ThreadStart(ReceiveMessage));
-            receiveThread.Start();
-        }
-        catch (SocketException e)
-        {
-            Debug.Log("SocketException: " + e);
-            listener.Stop();
-        }
-    }
-
-    private void ReceiveMessage()
-    {
-        byte[] data = new byte[4096];
-
-        while (isTcpConnected)
-        {
-            try
-            {
-                // read the incoming message from the client
-                int bytesReceived = stream.Read(data, 0, data.Length);
-                Debug.Log("Received message of size " + bytesReceived);
-
-                // set the boolean to indicate that only images should be sent
-                sendOnlyImage = true;
-            }
-            catch (Exception e)
-            {
-                Debug.Log("Error receiving message: " + e);
-                isTcpConnected = false;
-            }
-        }
+        stream.Close();
+        client.Close();
     }
 }
