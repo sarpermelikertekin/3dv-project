@@ -23,7 +23,7 @@ del_command = "rm -r ./yolov5/runs/detect/exp"
 model = torch.hub.load('ultralytics/yolov5', 'custom', weights_path)
 
 #a function that listens the image necessary
-@app.route('/') 
+@app.route('/one/') 
 def home():
     
 
@@ -48,12 +48,12 @@ def detect():
 
 
 
-@app.route('/stream/') 
+@app.route('/') 
 def run():
     
 
     HOST = 'localhost'
-    PORT = 5000
+    PORT = 6000
 
     # Create a socket and bind it to the host and port
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -109,5 +109,5 @@ def run():
 
 
 
-app.run(port=5000)
+app.run(port=3000)
 
