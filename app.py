@@ -12,8 +12,8 @@ import time
 app = Flask(__name__)
 
 #image_paths = ['./image'+str(i)+'.png' for i in range(1,7)]
-weights_path = './yolov5/best2.pt'
-image_path = './image6.png'
+weights_path = './yolov5/best29Epoch.pt'
+image_path = './image3.png'
 result_path = './yolov5/runs/detect/exp/labels/image.txt'
 command = "python3 ./yolov5/detect.py --weight " + weights_path + " --source "+image_path + " --save-txt"
 del_command = "rm -r ./yolov5/runs/detect/exp"
@@ -80,13 +80,16 @@ def run():
 
             # Decode the image data and display the image
             nparr = np.frombuffer(data, np.uint8)
+            
             try:
                 img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-                cv2.imwrite(image_path, img)
+                #cv2.imshow("receive", img)
+                cv2.imwrite(image_path, img)  
                 print("Image received")
                 #cv2.waitKey(1)
             except Exception as e:
                 print("Error decoding image:", e)
+            
 
             results = model(image_path)
             objects = results.pandas().xyxy  #this is a dataframe
