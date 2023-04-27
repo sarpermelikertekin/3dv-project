@@ -12,7 +12,7 @@ import time
 app = Flask(__name__)
 
 #image_paths = ['./image'+str(i)+'.png' for i in range(1,7)]
-weights_path = './yolov5/best29Epoch.pt'
+weights_path = './yolov5/best6.pt'
 image_path = './image3.png'
 result_path = './yolov5/runs/detect/exp/labels/image.txt'
 command = "python3 ./yolov5/detect.py --weight " + weights_path + " --source "+image_path + " --save-txt"
@@ -42,9 +42,10 @@ def home():
 @app.route('/detect/')
 def detect():
     os.system(command)
-    f = open(result_path,'r')
-    os.system(del_command)
-    return f.read()
+    #f = open(result_path,'r')
+    #os.system(del_command)
+    #return f.read()
+    return "success"
 
 
 
