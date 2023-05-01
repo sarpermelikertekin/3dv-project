@@ -4,7 +4,10 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Hololens Cam.unity
+    guid: 0e5da20a12d5d1d4791184368f47a477
   m_configObjects:
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: ab8971bb7c6fffa4b8f370dbe518c0dd, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 3078effbc5117ea4aa1d9dac839a9f77, type: 2}
