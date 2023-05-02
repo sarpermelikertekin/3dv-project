@@ -16,13 +16,16 @@ def iterateTextfile(path, savepath, datasetSize):
     bb_w = px_bb / px_x
     bb_h = px_bb / px_y
 
-    labels = ['FracturePlate_1x_MedScrewCut1', 'FracturePlate_1x_MedScrewCut2', 'FracturePlate_1x_LatScrewCut1', 'FracturePlate_1x_LatScrewCut2']
+    labels = ['FracturePlate_1x_MedScrewCut1', 'FracturePlate_1x_MedScrewCut1 (1)', 'FracturePlate_1x_LatScrewCut1', 'FracturePlate_1x_LatScrewCut1 (1)', 
+              'Med_Ins','Med_Ins','Lat_Ins','Lat_Ins']
     added = set()
 
 
     for line in lines[1:]:
         tokens = line.split()
         labelstr = tokens[-1]
+        if len(tokens) == 14:
+            labelstr = tokens[-2]
         label = -1
         for i in range(len(labels)):
             if labels[i] == labelstr:
@@ -37,6 +40,8 @@ def iterateTextfile(path, savepath, datasetSize):
         posy = (posy + 4.5) / 9
         posy = 1 - posy
         scale = tokens[-2][:-1]
+        if len(tokens) == 14:
+            scale = tokens[-3][:-1]
         bb_wi = str(float(scale) * bb_w)
         bb_hi = str(float(scale) * bb_h)
 
@@ -71,13 +76,13 @@ def trainTestSplit(stablepath, targetpath, datasetSize, ratio = 0.85):
             shutil.copyfile(stablepath + pathTxt, targetTrainLabel + pathTxt)
     return
         
-
-textpath = 'imagefile.txt'
-stablepath = './DataPointsStable.nosync/'
-targetpath = './DataPoints.nosync/'
+relative = './convert_to_yolo/'
+textpath = relative + 'imagefile.txt'
+stablepath = relative + 'Data Points/'
+targetpath = relative + 'DataPoints/'
 datasetSize = 5000
-
-#iterateTextfile(textpath, stablepath, datasetSize)
+print(os.listdir())
+iterateTextfile(textpath, stablepath, datasetSize)
 trainTestSplit(stablepath, targetpath, datasetSize, 0.85)
 
 #print(os.listdir(folderpath))
