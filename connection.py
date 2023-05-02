@@ -13,7 +13,7 @@ def run():
     
 
     #HOST = 'localhost'
-    HOST = '129.132.93.72'
+    HOST = ''
     PORT = 6000
 
     # Create a socket and bind it to the host and port
@@ -64,7 +64,7 @@ def run():
             conn.send(str(0).encode())
 
             print("Response sent")
-            time.sleep(0.5)
+            time.sleep(1.0)
             
         # Release resources and close the connection
         cv2.destroyAllWindows()
