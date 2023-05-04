@@ -4,5 +4,11 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
-  m_configObjects: {}
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Demos - HandTracking/Scenes/HandInteractionExamples.unity
+    guid: 3dd4a396b5225f8469b9a1eb608bfa57
+  m_configObjects:
+    com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: b10d5a9c63383c44eae43eb1672bf8d4, type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: e2439fc20b37c99469c2a2bf54987bc7, type: 2}
+    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 8aba0fc04ec7a6346b913428c84bc1d3, type: 2}
