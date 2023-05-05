@@ -58,15 +58,18 @@ public class DataSetGenerator : MonoBehaviour
         for (int i = 0; i < 5; i++)
         {
             int rand_index = Random.Range(0, implants.Length+1);
-            if (rand_index >= implants.Length - 2)
+            if (rand_index >= implants.Length - 0)
             {
                 continue;
             }
+
             activeImplant = implants[rand_index];
+            
             if (activeImplant.activeSelf)
             {
                 continue;
             }
+            
             activeImplant.SetActive(true);
             active_implants.Add(activeImplant);
         }
