@@ -13,6 +13,13 @@ public class HololensCameraCapture : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        StartCoroutine(CaptureRepeatadly());
+    }
+
+    IEnumerator CaptureRepeatadly()
+    {
+        yield return new WaitForSeconds(1);
+
         Resolution cameraResolution = PhotoCapture.SupportedResolutions.OrderByDescending((res) => res.width * res.height).First();
         targetTexture = new Texture2D(cameraResolution.width, cameraResolution.height);
 
@@ -31,6 +38,8 @@ public class HololensCameraCapture : MonoBehaviour
                 photoCaptureObject.TakePhotoAsync(OnCapturedPhotoToMemory);
             });
         });
+
+        StartCoroutine(CaptureRepeatadly());
     }
 
     void OnCapturedPhotoToMemory(PhotoCapture.PhotoCaptureResult result, PhotoCaptureFrame photoCaptureFrame)
