@@ -2,13 +2,14 @@ using UnityEngine;
 using System.Collections;
 using System.Linq;
 using UnityEngine.Windows.WebCam;
+using UnityEngine.UI;
 
 public class HololensCameraCapture : MonoBehaviour
 {
     PhotoCapture photoCaptureObject = null;
     Texture2D targetTexture = null;
 
-    public Material quadMat;
+    public RawImage rawImage;
 
     // Use this for initialization
     void Start()
@@ -47,15 +48,8 @@ public class HololensCameraCapture : MonoBehaviour
         // Copy the raw image data into the target texture
         photoCaptureFrame.UploadImageDataToTexture(targetTexture);
 
-        // Create a GameObject to which the texture can be applied
-        GameObject quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
-        Renderer quadRenderer = quad.GetComponent<Renderer>() as Renderer;
-        quadRenderer.material = quadMat;
-
-        quad.transform.parent = this.transform;
-        quad.transform.localPosition = new Vector3(0.0f, 0.0f, 3.0f);
-
-        quadRenderer.material.SetTexture("_MainTex", targetTexture);
+        rawImage.texture = targetTexture;
+        rawImage.material.mainTexture = targetTexture;
 
         // Deactivate the camera
         photoCaptureObject.StopPhotoModeAsync(OnStoppedPhotoMode);
