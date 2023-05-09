@@ -43,6 +43,9 @@ ExportedObj/
 *.opendb
 *.VC.db
 
+#Keep Dataset Local 
+Data/
+
 # Unity3D generated meta files
 *.pidb.meta
 *.pdb.meta
