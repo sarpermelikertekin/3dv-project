@@ -17,7 +17,7 @@ def iterateTextfile(path, savepath, datasetSize):
     bb_h = px_bb / px_y
 
     labels = ['FracturePlate_1x_MedScrewCut1', 'FracturePlate_1x_MedScrewCut1 (1)', 'FracturePlate_1x_LatScrewCut1', 'FracturePlate_1x_LatScrewCut1 (1)', 
-              'Med_Ins','Med_Ins','Lat_Ins','Lat_Ins']
+              'Med_Ins','Med_Ins (2)','Lat_Ins','Lat_Ins2']
     added = set()
 
 
@@ -60,12 +60,12 @@ def iterateTextfile(path, savepath, datasetSize):
 def trainTestSplit(stablepath, targetpath, datasetSize, ratio = 0.85):
     noTrain = int(datasetSize * ratio)
     noVal = datasetSize - noTrain
-    valIndex = set(random.sample(range(0, 5000), noVal))
+    valIndex = set(random.sample(range(0, datasetSize), noVal))
     targetTrainImg = targetpath + "images/train/"
     targetValImg = targetpath + "images/val/"
     targetTrainLabel = targetpath + "labels/train/"
     targetValLabel = targetpath + "labels/val/"
-    for i in range(5000):
+    for i in range(datasetSize):
         pathImg = "Data Point " + str(i) +".png"
         pathTxt = "Data Point " + str(i) +".txt"
         if i in valIndex:
@@ -77,12 +77,11 @@ def trainTestSplit(stablepath, targetpath, datasetSize, ratio = 0.85):
     return
         
 relative = './convert_to_yolo/'
-textpath = relative + 'imagefile.txt'
-stablepath = relative + 'Data Points/'
-targetpath = relative + 'DataPoints/'
-datasetSize = 5000
-print(os.listdir())
-iterateTextfile(textpath, stablepath, datasetSize)
+textpath = 'imagefile.txt'
+stablepath = './DataPoints/'
+targetpath = './DataPointsFinal/'
+datasetSize = 3000
+#iterateTextfile(textpath, stablepath, datasetSize)
 trainTestSplit(stablepath, targetpath, datasetSize, 0.85)
 
 #print(os.listdir(folderpath))

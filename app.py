@@ -12,9 +12,9 @@ import time
 app = Flask(__name__)
 
 #image_paths = ['./image'+str(i)+'.png' for i in range(1,7)]
-weights_path = './yolov5/best29Epoch.pt'
+weights_path = './models/epoch18_withInstruments.pt'
 weights_path2 = './bestModelEpoch37.pt'
-image_path = './image3.png'
+image_path = './real_images/image4.png'
 result_path = './yolov5/runs/detect/exp/labels/image.txt'
 command = "python3 ./yolov5/detect.py --weight " + weights_path + " --source "+image_path + " --save-txt"
 del_command = "rm -r ./yolov5/runs/detect/exp"
@@ -22,7 +22,7 @@ del_command = "rm -r ./yolov5/runs/detect/exp"
 
 
 model = torch.hub.load('ultralytics/yolov5', 'custom', weights_path)
-model2 = torch.hub.load('ultralytics/yolov5', 'custom', weights_path2)
+#model2 = torch.hub.load('ultralytics/yolov5', 'custom', weights_path2)
 
 #a function that listens the image necessary
 @app.route('/one/') 

@@ -55,10 +55,16 @@ public class DataSetGenerator : MonoBehaviour
             active_implants[i].SetActive(false);
             active_implants.RemoveAt(i);
         }
+
+        int rand_no_implants = Random.Range(0, 5);
+        if(rand_no_implants < 1) //no objects with 0.2 probability
+            return;
+
+
         for (int i = 0; i < 5; i++)
         {
             int rand_index = Random.Range(0, implants.Length+1);
-            if (rand_index >= implants.Length - 2)
+            if (rand_index >= implants.Length)
             {
                 continue;
             }

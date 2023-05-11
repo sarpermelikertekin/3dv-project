@@ -1016,8 +1016,8 @@ MonoBehaviour:
   boundingBox: {fileID: 1508557467}
   implantData: 
   outputFileName: 
-  numberOfImages: 10
-  dataPointWaitTime: 0.001
+  numberOfImages: 3000
+  dataPointWaitTime: 0.0001
   counter: 0
 --- !u!114 &1055626056
 MonoBehaviour:
