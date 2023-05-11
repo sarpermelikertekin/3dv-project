@@ -19192,6 +19192,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1383042288}
+  - component: {fileID: 1383042289}
   m_Layer: 0
   m_Name: Debug Panel
   m_TagString: Untagged
@@ -19215,6 +19216,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 160, z: 0}
+--- !u!114 &1383042289
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1383042287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0264b09be7b2d3942964a11a386c36cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  consoleText: {fileID: 0}
 --- !u!1 &1388759490
 GameObject:
   m_ObjectHideFlags: 0
@@ -19245,6 +19259,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rawImage: {fileID: 1495676134}
+  sendOnlyImage: 0
+  host: 192.168.64.73
+  port: 5000
 --- !u!4 &1388759492
 Transform:
   m_ObjectHideFlags: 0

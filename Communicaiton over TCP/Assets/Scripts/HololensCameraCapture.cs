@@ -19,8 +19,10 @@ public class HololensCameraCapture : MonoBehaviour
     private bool isWaitingForResponse = false;
     private string response;
 
-    public string host = "127.0.0.1";
-    public int port = 5000;
+    string host = "127.0.0.1";
+    //public string host = "192.168.64.73";
+
+    int port = 5000;
 
     // Use this for initialization
     void Start()
