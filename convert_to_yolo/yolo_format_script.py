@@ -16,20 +16,17 @@ def iterateTextfile(path, savepath, datasetSize):
     bb_w = px_bb / px_x
     bb_h = px_bb / px_y
 
-    labels = ['FracturePlate_1x_MedScrewCut1', 'FracturePlate_1x_MedScrewCut1 (1)', 'FracturePlate_1x_LatScrewCut1', 'FracturePlate_1x_LatScrewCut1 (1)', 
-              'Med_Ins','Med_Ins','Lat_Ins','Lat_Ins']
+    labels = ['Screw1', 'Screw2', 'Screw3', 'Screw4', 'Screw5']
     added = set()
 
 
     for line in lines[1:]:
         tokens = line.split()
         labelstr = tokens[-1]
-        if len(tokens) == 14:
-            labelstr = tokens[-2]
         label = -1
         for i in range(len(labels)):
             if labels[i] == labelstr:
-                label = str(i//2)
+                label = str(i)
                 break
         index_str = tokens[0]
         index = int(index_str[:-1])
@@ -40,8 +37,6 @@ def iterateTextfile(path, savepath, datasetSize):
         posy = (posy + 4.5) / 9
         posy = 1 - posy
         scale = tokens[-2][:-1]
-        if len(tokens) == 14:
-            scale = tokens[-3][:-1]
         bb_wi = str(float(scale) * bb_w)
         bb_hi = str(float(scale) * bb_h)
 
@@ -60,12 +55,12 @@ def iterateTextfile(path, savepath, datasetSize):
 def trainTestSplit(stablepath, targetpath, datasetSize, ratio = 0.85):
     noTrain = int(datasetSize * ratio)
     noVal = datasetSize - noTrain
-    valIndex = set(random.sample(range(0, 5000), noVal))
+    valIndex = set(random.sample(range(0, datasetSize), noVal))
     targetTrainImg = targetpath + "images/train/"
     targetValImg = targetpath + "images/val/"
     targetTrainLabel = targetpath + "labels/train/"
     targetValLabel = targetpath + "labels/val/"
-    for i in range(5000):
+    for i in range(datasetSize):
         pathImg = "Data Point " + str(i) +".png"
         pathTxt = "Data Point " + str(i) +".txt"
         if i in valIndex:
@@ -76,11 +71,12 @@ def trainTestSplit(stablepath, targetpath, datasetSize, ratio = 0.85):
             shutil.copyfile(stablepath + pathTxt, targetTrainLabel + pathTxt)
     return
         
+print(os.listdir())
 relative = './convert_to_yolo/'
 textpath = relative + 'imagefile.txt'
 stablepath = relative + 'Data Points/'
-targetpath = relative + 'DataPoints/'
-datasetSize = 5000
+targetpath = relative + 'Data_Points_YOLO_2/'
+datasetSize = 400
 print(os.listdir())
 iterateTextfile(textpath, stablepath, datasetSize)
 trainTestSplit(stablepath, targetpath, datasetSize, 0.85)
