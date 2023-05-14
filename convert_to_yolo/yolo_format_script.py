@@ -76,7 +76,7 @@ relative = './convert_to_yolo/'
 textpath = relative + 'imagefile.txt'
 stablepath = relative + 'Data Points/'
 targetpath = relative + 'Data_Points_rdy_for_YOLO/'
-datasetSize = 400
+datasetSize = 5000
 print(os.listdir())
 iterateTextfile(textpath, stablepath, datasetSize)
 trainTestSplit(stablepath, targetpath, datasetSize, 0.85)
