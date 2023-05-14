@@ -75,7 +75,7 @@ print(os.listdir())
 relative = './convert_to_yolo/'
 textpath = relative + 'imagefile.txt'
 stablepath = relative + 'Data Points/'
-targetpath = relative + 'Data_Points_YOLO_2/'
+targetpath = relative + 'Data_Points_rdy_for_YOLO/'
 datasetSize = 400
 print(os.listdir())
 iterateTextfile(textpath, stablepath, datasetSize)
