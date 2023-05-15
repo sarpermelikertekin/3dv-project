@@ -5,7 +5,7 @@ import random
 import shutil
 
 def iterateTextfile(path, savepath, datasetSize):
-
+    print("Iterating Text File...")
 
     file = open(path, 'r')
     lines = file.readlines()
@@ -19,6 +19,9 @@ def iterateTextfile(path, savepath, datasetSize):
     labels = ['Screw1', 'Screw2', 'Screw3', 'Screw4', 'Screw5']
     added = set()
 
+    # Progress variables
+    counter = 0
+    total_iterations = len(lines[1:])
 
     for line in lines[1:]:
         tokens = line.split()
@@ -45,14 +48,33 @@ def iterateTextfile(path, savepath, datasetSize):
         #f.truncate()
         f.write(printline)
         f.close()
-    
+
+        #Display progress
+        if counter % 1000 == 0:
+            print("A: Current iteration: {0}, Total iterations: {1}".format(counter, total_iterations))
+        counter=counter+1
+        
+    print("--Done--")
+    #---------------------------
+    total_iterations = datasetSize
+    counter = 0
+
     for i in range(datasetSize):
+        #Display progress
+        if counter % 1000 == 0:
+            print("B: Current iteration: {0}, Total iterations: {1}".format(counter, total_iterations))
+        counter=counter+1
+
         if i not in added:
             f = open(savepath + "Data Point "+ str(i) + ".txt", "w")
             f.close()
 
+    print("Iterating Text File - DONE")
+
 
 def trainTestSplit(stablepath, targetpath, datasetSize, ratio = 0.85):
+    print("Splitting Train/Test...")
+
     noTrain = int(datasetSize * ratio)
     noVal = datasetSize - noTrain
     valIndex = set(random.sample(range(0, datasetSize), noVal))
@@ -60,7 +82,15 @@ def trainTestSplit(stablepath, targetpath, datasetSize, ratio = 0.85):
     targetValImg = targetpath + "images/val/"
     targetTrainLabel = targetpath + "labels/train/"
     targetValLabel = targetpath + "labels/val/"
+
+    total_iterations = datasetSize
+    counter = 0
     for i in range(datasetSize):
+        #Display progress
+        if counter % 100 == 0:
+            print("C: Current iteration: {0}, Total iterations: {1}".format(counter, total_iterations))
+        counter=counter+1
+
         pathImg = "Data Point " + str(i) +".png"
         pathTxt = "Data Point " + str(i) +".txt"
         if i in valIndex:
@@ -69,6 +99,8 @@ def trainTestSplit(stablepath, targetpath, datasetSize, ratio = 0.85):
         else:
             shutil.copyfile(stablepath + pathImg, targetTrainImg + pathImg)
             shutil.copyfile(stablepath + pathTxt, targetTrainLabel + pathTxt)
+    
+    print("Splitting Train/Test - DONE")
     return
         
 print(os.listdir())
