@@ -3,12 +3,13 @@ import pandas as pd
 import os
 import random
 import shutil
+import glob
 
-def iterateTextfile(path, savepath, datasetSize):
+def iterateTextfile(imagefile_path, datapoints_path, datasetSize):
     print("Iterating Text File...")
 
-    file = open(path, 'r')
-    lines = file.readlines()
+    imagefile = open(imagefile_path, 'r')
+    lines = imagefile.readlines()
 
     px_x = 1600
     px_y = 900
@@ -44,7 +45,7 @@ def iterateTextfile(path, savepath, datasetSize):
         bb_hi = str(float(scale) * bb_h)
 
         printline = str(label) + " " + str(posx) + " " + str(posy) + " " + bb_wi + " " + bb_hi + "\n"
-        f = open(savepath + "Data Point "+ str(index) + ".txt", "a")
+        f = open(datapoints_path + "Data Point "+ str(index) + ".txt", "a")
         #f.truncate()
         f.write(printline)
         f.close()
@@ -66,13 +67,28 @@ def iterateTextfile(path, savepath, datasetSize):
         counter=counter+1
 
         if i not in added:
-            f = open(savepath + "Data Point "+ str(i) + ".txt", "w")
+            f = open(datapoints_path + "Data Point "+ str(i) + ".txt", "w")
             f.close()
 
     print("Iterating Text File - DONE")
 
+def cleanup(datapoints_path):
+    print("Cleaning old textfiles...")
 
-def trainTestSplit(stablepath, targetpath, datasetSize, ratio = 0.85):
+    folder_path = datapoints_path
+
+    # Get a list of all .txt files in the folder
+    txt_files = glob.glob(os.path.join(folder_path, "*.txt"))
+
+    # Iterate over the list and delete each file
+    for file_path in txt_files:
+        os.remove(file_path)
+        #print(f"Deleted file: {file_path}")
+    
+    print("Cleaning textfiles - DONE")
+    return
+
+def trainTestSplit(datapoints_path, targetpath, datasetSize, ratio = 0.85):
     print("Splitting Train/Test...")
 
     noTrain = int(datasetSize * ratio)
@@ -94,24 +110,24 @@ def trainTestSplit(stablepath, targetpath, datasetSize, ratio = 0.85):
         pathImg = "Data Point " + str(i) +".png"
         pathTxt = "Data Point " + str(i) +".txt"
         if i in valIndex:
-            shutil.copyfile(stablepath + pathImg, targetValImg + pathImg)
-            shutil.copyfile(stablepath + pathTxt, targetValLabel + pathTxt)
+            shutil.copyfile(datapoints_path + pathImg, targetValImg + pathImg)
+            shutil.copyfile(datapoints_path + pathTxt, targetValLabel + pathTxt)
         else:
-            shutil.copyfile(stablepath + pathImg, targetTrainImg + pathImg)
-            shutil.copyfile(stablepath + pathTxt, targetTrainLabel + pathTxt)
+            shutil.copyfile(datapoints_path + pathImg, targetTrainImg + pathImg)
+            shutil.copyfile(datapoints_path + pathTxt, targetTrainLabel + pathTxt)
     
     print("Splitting Train/Test - DONE")
     return
         
 print(os.listdir())
 relative = './convert_to_yolo/'
-textpath = relative + 'imagefile.txt'
-stablepath = relative + 'Data Points/'
+imagefile_path = relative + 'imagefile.txt'
+datapoints_path = relative + 'Data Points/'
 targetpath = relative + 'Data_Points_rdy_for_YOLO/'
 datasetSize = 5000
-print(os.listdir())
-iterateTextfile(textpath, stablepath, datasetSize)
-trainTestSplit(stablepath, targetpath, datasetSize, 0.85)
+cleanup(datapoints_path)
+iterateTextfile(imagefile_path, datapoints_path, datasetSize)
+trainTestSplit(datapoints_path, targetpath, datasetSize, 0.85)
 
 #print(os.listdir(folderpath))
 
