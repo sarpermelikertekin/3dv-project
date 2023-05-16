@@ -10,7 +10,6 @@ public class HololensCameraCapture : MonoBehaviour
 {
     PhotoCapture photoCaptureObject = null;
     Texture2D targetTexture = null;
-
     public RawImage rawImage;
 
     public bool sendOnlyImage;
@@ -19,12 +18,10 @@ public class HololensCameraCapture : MonoBehaviour
     private bool isWaitingForResponse = false;
     private string response;
 
-    string host = "127.0.0.1";
-    //public string host = "192.168.64.73";
+    string host = "192.168.247.229";
+    int port = 6000;
+    int segmentSize = 1024;  // Define the size of each segment
 
-    int port = 5000;
-
-    // Use this for initialization
     void Start()
     {
         Resolution cameraResolution = PhotoCapture.SupportedResolutions.OrderByDescending((res) => res.width * res.height).First();
@@ -62,20 +59,11 @@ public class HololensCameraCapture : MonoBehaviour
 
     void OnCapturedPhotoToMemory(PhotoCapture.PhotoCaptureResult result, PhotoCaptureFrame photoCaptureFrame)
     {
-        // Copy the raw image data into the target texture
         photoCaptureFrame.UploadImageDataToTexture(targetTexture);
-
         rawImage.texture = targetTexture;
         rawImage.material.mainTexture = targetTexture;
 
-        // Encode the texture as a PNG image
         byte[] imageBytes = targetTexture.EncodeToPNG();
-
-        // Prepend the length of the image data as a 4-byte integer
-        byte[] lengthBytes = BitConverter.GetBytes(imageBytes.Length);
-        byte[] sendBytes = new byte[lengthBytes.Length + imageBytes.Length];
-        lengthBytes.CopyTo(sendBytes, 0);
-        imageBytes.CopyTo(sendBytes, lengthBytes.Length);
 
         if (client == null)
         {
@@ -83,14 +71,26 @@ public class HololensCameraCapture : MonoBehaviour
             stream = client.GetStream();
         }
 
-        // Send the length-prefixed image data over the network
-        stream.Write(sendBytes, 0, sendBytes.Length);
+        int offset = 0;
+        while (offset < imageBytes.Length)
+        {
+            int size = Math.Min(segmentSize, imageBytes.Length - offset);
+            byte[] segment = new byte[size];
+            Array.Copy(imageBytes, offset, segment, 0, size);
+            offset += size;
 
-        Debug.Log("Image sent. Length: " + imageBytes.Length);
+            byte[] lengthBytes = BitConverter.GetBytes(size);
+            byte[] sendBytes = new byte[lengthBytes.Length + segment.Length];
+            lengthBytes.CopyTo(sendBytes, 0);
+            segment.CopyTo(sendBytes, lengthBytes.Length);
 
-        // Wait for a response from the server
-        isWaitingForResponse = true;
-        StartCoroutine(WaitForResponse());
+            stream.Write(sendBytes, 0, sendBytes.Length);
+
+            Debug.Log("Segment sent. Length: " + segment.Length);
+
+            isWaitingForResponse = true;
+            StartCoroutine(WaitForResponse());
+        }
     }
 
     IEnumerator WaitForResponse()
@@ -106,16 +106,16 @@ public class HololensCameraCapture : MonoBehaviour
             }
             yield return null;
         }
-        isWaitingForResponse = false;
+        if (response == "ACK")
+        {
+            isWaitingForResponse = false;
+        }
         Debug.Log("Response received: " + response);
     }
 
     void OnApplicationQuit()
     {
-        void OnApplicationQuit()
-        {
-            stream.Close();
-            client.Close();
-        }
+        stream.Close();
+        client.Close();
     }
 }

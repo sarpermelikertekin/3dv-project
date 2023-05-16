@@ -1,92 +1,56 @@
-using System;
-using System.Net.Sockets;
-using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
+using System.Net;
+using System.Net.Sockets;
+using System.IO;
 
 public class WebcamController : MonoBehaviour
 {
-    public RawImage rawImage;
-    public bool sendOnlyImage;
+    string ipAddress = "10.5.176.228"; // Replace with the IP address of the Python server
+    int port = 6000; // Replace with a port number
 
     private WebCamTexture webcamTexture;
-    private Texture2D texture2D;
-
-    public string host = "127.0.0.1";
-    public int port = 5000;
-
-    private TcpClient client;
-    private NetworkStream stream;
-
-    private bool isWaitingForResponse = false;
-    private string response;
 
     void Start()
     {
-        webcamTexture = new WebCamTexture();
-        rawImage.texture = webcamTexture;
-        rawImage.material.mainTexture = webcamTexture;
-        webcamTexture.Play();
-
-        texture2D = new Texture2D(webcamTexture.width, webcamTexture.height);
-
-        client = new TcpClient(host, port);
-        stream = client.GetStream();
-
-        StartCoroutine(CaptureAndSendImage());
-    }
-
-    IEnumerator CaptureAndSendImage()
-    {
-        while (true)
+        // Get the default webcam and start it
+        var webcamDevices = WebCamTexture.devices;
+        if (webcamDevices.Length > 0)
         {
-            if (!isWaitingForResponse)
-            {
-                texture2D.SetPixels(webcamTexture.GetPixels());
-                texture2D.Apply();
-
-                // Encode the texture as a PNG image
-                byte[] imageBytes = texture2D.EncodeToPNG();
-
-                // Prepend the length of the image data as a 4-byte integer
-                byte[] lengthBytes = BitConverter.GetBytes(imageBytes.Length);
-                byte[] sendBytes = new byte[lengthBytes.Length + imageBytes.Length];
-                lengthBytes.CopyTo(sendBytes, 0);
-                imageBytes.CopyTo(sendBytes, lengthBytes.Length);
-
-                // Send the length-prefixed image data over the network
-                stream.Write(sendBytes, 0, sendBytes.Length);
-
-                Debug.Log("Image sent. Length: " + imageBytes.Length);
-
-                // Wait for a response from the server
-                isWaitingForResponse = true;
-                yield return StartCoroutine(WaitForResponse());
-            }
-            yield return null;
+            var webcamDevice = webcamDevices[0];
+            webcamTexture = new WebCamTexture(webcamDevice.name, 640, 480, 30);
+            webcamTexture.Play();
         }
     }
 
-    IEnumerator WaitForResponse()
+    void Update()
     {
-        byte[] responseBytes = new byte[1024];
-        int bytesRead = 0;
-        while (bytesRead == 0)
+        // Capture a frame from the webcam texture and send it to the Python server
+        if (webcamTexture != null)
         {
-            if (stream.DataAvailable)
-            {
-                bytesRead = stream.Read(responseBytes, 0, responseBytes.Length);
-                response = System.Text.Encoding.ASCII.GetString(responseBytes, 0, bytesRead);
-            }
-            yield return null;
-        }
-        isWaitingForResponse = false;
-        Debug.Log("Response received: " + response);
-    }
+            Texture2D texture = new Texture2D(webcamTexture.width, webcamTexture.height, TextureFormat.RGB24, false);
+            texture.SetPixels(webcamTexture.GetPixels());
+            texture.Apply();
+            byte[] imageData = texture.GetRawTextureData();
+            var imageWidth = webcamTexture.width;
+            var imageHeight = webcamTexture.height;
+            var imageBytes = new byte[imageData.Length + 8];
+            System.Buffer.BlockCopy(System.BitConverter.GetBytes(imageWidth), 0, imageBytes, 0, 4);
+            System.Buffer.BlockCopy(System.BitConverter.GetBytes(imageHeight), 0, imageBytes, 4, 4);
+            System.Buffer.BlockCopy(imageData, 0, imageBytes, 8, imageData.Length);
 
-    void OnApplicationQuit()
-    {
-        stream.Close();
-        client.Close();
+            try
+            {
+                // Send the image data to the Python server
+                var client = new TcpClient(ipAddress, port);
+                var stream = client.GetStream();
+                stream.Write(imageBytes, 0, imageBytes.Length);
+                stream.Close();
+                client.Close();
+            }
+            catch (SocketException e)
+            {
+                Debug.Log("SocketException: " + e);
+            }
+        }
     }
 }
