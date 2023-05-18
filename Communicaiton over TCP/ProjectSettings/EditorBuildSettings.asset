@@ -8,10 +8,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Demos - HandTracking/Scenes/HandInteractionExamples.unity
     guid: 3dd4a396b5225f8469b9a1eb608bfa57
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Hololens Stream.unity
     guid: 72a8c0f1b6fd46a4e87fc74ff44daa25
-  - enabled: 1
+  - enabled: 0
     path: Assets/Samples/Mixed Reality Toolkit Examples/2.8.3/Experimental - MixedRealityKeyboard/Scenes/MixedRealityKeyboardExample.unity
     guid: b21a91f417fdc7b41b531772ff092fcb
   m_configObjects:
