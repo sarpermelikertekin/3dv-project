@@ -30,6 +30,14 @@ public class HololensCameraCapture : MonoBehaviour
     public string host;
     public string port;
 
+    byte[] imageBytes;
+
+    public const int BufferSize = 16384; // you may need to adjust this size
+    private byte[] imageBuffer = new byte[BufferSize];
+    private int imageBufferOffset = 0;
+
+    private int accumulator = 0;
+
     // Use this for initialization
     void Start()
     {
@@ -43,10 +51,6 @@ public class HololensCameraCapture : MonoBehaviour
 
         InputPanel.SetActive(false);
         DebugPanel.SetActive(true);
-
-        Debug.Log(host);
-        Debug.Log(port);
-        Debug.Log(FindNumberInString(port));
 
         StartCapturing();
     }
@@ -163,13 +167,41 @@ public class HololensCameraCapture : MonoBehaviour
         rawImage.material.mainTexture = targetTexture;
 
         // Encode the texture as a PNG image
-        byte[] imageBytes = targetTexture.EncodeToPNG();
+        imageBytes = targetTexture.EncodeToPNG();
 
-        // Prepend the length of the image data as a 4-byte integer
-        byte[] lengthBytes = BitConverter.GetBytes(imageBytes.Length);
-        byte[] sendBytes = new byte[lengthBytes.Length + imageBytes.Length];
-        lengthBytes.CopyTo(sendBytes, 0);
-        imageBytes.CopyTo(sendBytes, lengthBytes.Length);
+        // Segment image into chunks and send them
+        for (int i = 0; i < imageBytes.Length; i += BufferSize)
+        {
+            // Calculate chunk size (last chunk can be smaller)
+            int chunkSize = Mathf.Min(BufferSize, imageBytes.Length - i);
+
+            Debug.Log("chunkSize" + chunkSize);
+
+            // Copy chunk into buffer
+            Array.Copy(imageBytes, i, imageBuffer, 0, chunkSize);
+            imageBufferOffset = chunkSize;
+
+            // Send buffer
+            SendBuffer();
+
+            // Wait for a response from the server
+            isWaitingForResponse = true;
+            StartCoroutine(WaitForResponse());
+        }
+    }
+
+    private void SendBuffer()
+    {
+        // Prepend the size of the package (i.e., imageBufferOffset)
+        byte[] packageSizeBytes = BitConverter.GetBytes(imageBufferOffset);
+
+        // Prepend the size of the entire image
+        byte[] imageSizeBytes = BitConverter.GetBytes(imageBytes.Length);
+
+        byte[] sendBytes = new byte[packageSizeBytes.Length + imageSizeBytes.Length + imageBufferOffset];
+        packageSizeBytes.CopyTo(sendBytes, 0);
+        imageSizeBytes.CopyTo(sendBytes, packageSizeBytes.Length);
+        imageBuffer.CopyTo(sendBytes, packageSizeBytes.Length + imageSizeBytes.Length);
 
         if (client == null)
         {
@@ -180,11 +212,10 @@ public class HololensCameraCapture : MonoBehaviour
         // Send the length-prefixed image data over the network
         stream.Write(sendBytes, 0, sendBytes.Length);
 
-        Debug.Log("Image sent. Length: " + imageBytes.Length);
+        accumulator += BufferSize;
 
-        // Wait for a response from the server
-        isWaitingForResponse = true;
-        StartCoroutine(WaitForResponse());
+        Debug.Log("Image chunk sent. Length: " + imageBufferOffset);
+        Debug.Log("Rest: " + (imageBytes.Length - accumulator));
     }
 
     IEnumerator WaitForResponse()
@@ -197,6 +228,16 @@ public class HololensCameraCapture : MonoBehaviour
             {
                 bytesRead = stream.Read(responseBytes, 0, responseBytes.Length);
                 response = System.Text.Encoding.ASCII.GetString(responseBytes, 0, bytesRead);
+
+                // Check if server wants more data
+                if (response == "send more")
+                {
+                    // Reset buffer offset
+                    imageBufferOffset = 0;
+
+                    // Send the next chunk
+                    SendBuffer();
+                }
             }
             yield return null;
         }
