@@ -12189,16 +12189,28 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2800000, guid: 0bee624b4074e5445929e56287795085, type: 3}
     - target: {fileID: 8779034279059886464, guid: 3f1f46cbecbe08e46a303ccfdb5b498a, type: 3}
-      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 916460298}
-    - target: {fileID: 8779034279059886464, guid: 3f1f46cbecbe08e46a303ccfdb5b498a, type: 3}
-      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.size
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8779034279059886464, guid: 3f1f46cbecbe08e46a303ccfdb5b498a, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1388759491}
+    - target: {fileID: 8779034279059886464, guid: 3f1f46cbecbe08e46a303ccfdb5b498a, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8779034279059886464, guid: 3f1f46cbecbe08e46a303ccfdb5b498a, type: 3}
       propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: Increment
+      value: AdjustUI
+      objectReference: {fileID: 0}
+    - target: {fileID: 8779034279059886464, guid: 3f1f46cbecbe08e46a303ccfdb5b498a, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: HololensCameraCapture, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 8779034279059886464, guid: 3f1f46cbecbe08e46a303ccfdb5b498a, type: 3}
+      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 9173740976984213209, guid: 3f1f46cbecbe08e46a303ccfdb5b498a, type: 3}
       propertyPath: m_Size.x
@@ -16823,6 +16835,17 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 974814029}
   m_Mesh: {fileID: 4300000, guid: 24d47aad909b7114f99ea8657d2883d8, type: 3}
+--- !u!114 &987821286 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2093565322100020847, guid: 4daceed0c4c3c09468897226b8717688, type: 3}
+  m_PrefabInstance: {fileID: 2042110630}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &992762285 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2204069623020599746, guid: 3f1f46cbecbe08e46a303ccfdb5b498a, type: 3}
@@ -18689,6 +18712,10 @@ PrefabInstance:
     - target: {fileID: 4950879267763742286, guid: 3bf44c52ef9712d4c9f66d494b027d24, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 21.999998
+      objectReference: {fileID: 0}
+    - target: {fileID: 4950879267773740633, guid: 3bf44c52ef9712d4c9f66d494b027d24, type: 3}
+      propertyPath: m_Name
+      value: IP
       objectReference: {fileID: 0}
     - target: {fileID: 4950879268214185240, guid: 3bf44c52ef9712d4c9f66d494b027d24, type: 3}
       propertyPath: m_text
@@ -22734,7 +22761,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1388759491
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22748,7 +22775,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rawImage: {fileID: 1495676134}
+  InputPanel: {fileID: 1060017364}
+  DebugPanel: {fileID: 1383042287}
+  ipInput: {fileID: 1735074402}
+  portInputField: {fileID: 987821286}
   sendOnlyImage: 0
+  host: 
+  port: 0
 --- !u!4 &1388759492
 Transform:
   m_ObjectHideFlags: 0
@@ -28054,6 +28087,17 @@ MonoBehaviour:
   handleSlatePrefab: {fileID: 1134031327877807717, guid: c45e552a6d92491468c421c35c5dd63d, type: 3}
   showScaleHandles: 1
   scaleBehavior: 0
+--- !u!114 &1735074402 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4950879267773740635, guid: 3bf44c52ef9712d4c9f66d494b027d24, type: 3}
+  m_PrefabInstance: {fileID: 1119645566}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1798077755
 GameObject:
   m_ObjectHideFlags: 0
@@ -30879,6 +30923,10 @@ PrefabInstance:
     - target: {fileID: 2093565322073310843, guid: 4daceed0c4c3c09468897226b8717688, type: 3}
       propertyPath: m_Name
       value: MRKeyboardInputField (TMP) (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2093565322100020845, guid: 4daceed0c4c3c09468897226b8717688, type: 3}
+      propertyPath: m_Name
+      value: Port
       objectReference: {fileID: 0}
     - target: {fileID: 2093565322100020847, guid: 4daceed0c4c3c09468897226b8717688, type: 3}
       propertyPath: m_textAlignment

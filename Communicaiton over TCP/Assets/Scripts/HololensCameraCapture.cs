@@ -5,6 +5,7 @@ using UnityEngine.Windows.WebCam;
 using UnityEngine.UI;
 using System.Net.Sockets;
 using System;
+using TMPro;
 
 public class HololensCameraCapture : MonoBehaviour
 {
@@ -13,19 +14,112 @@ public class HololensCameraCapture : MonoBehaviour
 
     public RawImage rawImage;
 
+    public GameObject InputPanel;
+    public GameObject DebugPanel;
+
+    public TextMeshProUGUI ipInput;
+    public TextMeshProUGUI portInputField;
+
     public bool sendOnlyImage;
     private TcpClient client;
     private NetworkStream stream;
     private bool isWaitingForResponse = false;
     private string response;
 
-    string host = "127.0.0.1";
-    //public string host = "192.168.64.73";
-
-    int port = 5000;
+    //string host = "127.0.0.1";
+    public string host;
+    public string port;
 
     // Use this for initialization
     void Start()
+    {
+
+    }
+
+    public void AdjustUI()
+    {
+        host = ipInput.text;
+        port = portInputField.text;
+
+        InputPanel.SetActive(false);
+        DebugPanel.SetActive(true);
+
+        Debug.Log(host);
+        Debug.Log(port);
+        Debug.Log(FindNumberInString(port));
+
+        StartCapturing();
+    }
+
+    public int FindNumberInString(string inputString)
+    {
+        int number = 0;
+        int multiplier = 1;
+
+        for (int i = inputString.Length - 1; i >= 0; i--)
+        {
+            if (char.IsDigit(inputString[i]))
+            {
+                int.TryParse(inputString[i].ToString(), out int parsedNumber);
+                number += parsedNumber * multiplier;
+                multiplier *= 10;
+            }
+        }
+
+        return number;
+    }
+
+    public string FindIPv4InString(string inputString)
+    {
+        string currentNumber = "";
+        int partCount = 0;
+        string ipAddress = "";
+
+        for (int i = 0; i < inputString.Length; i++)
+        {
+            if (char.IsDigit(inputString[i]))
+            {
+                currentNumber += inputString[i];
+            }
+            else if (inputString[i] == '.' || i == inputString.Length - 1)
+            {
+                if (currentNumber != "" && int.Parse(currentNumber) <= 255)
+                {
+                    ipAddress += currentNumber + ".";
+                    partCount++;
+                    currentNumber = "";
+                }
+                else
+                {
+                    ipAddress = "";
+                    partCount = 0;
+                }
+            }
+            else
+            {
+                currentNumber = "";
+                ipAddress = "";
+                partCount = 0;
+            }
+
+            // If we have 4 valid parts, we have a valid IP address.
+            if (partCount == 4)
+            {
+                break;
+            }
+        }
+
+        // If we found a valid IP address, remove the trailing '.' and return it.
+        if (partCount == 4)
+        {
+            return ipAddress.TrimEnd('.');
+        }
+
+        // No valid IP address found.
+        return null;
+    }
+
+    public void StartCapturing()
     {
         Resolution cameraResolution = PhotoCapture.SupportedResolutions.OrderByDescending((res) => res.width * res.height).First();
         targetTexture = new Texture2D(cameraResolution.width, cameraResolution.height);
@@ -79,7 +173,7 @@ public class HololensCameraCapture : MonoBehaviour
 
         if (client == null)
         {
-            client = new TcpClient(host, port);
+            client = new TcpClient(FindIPv4InString(host), FindNumberInString(port));
             stream = client.GetStream();
         }
 
