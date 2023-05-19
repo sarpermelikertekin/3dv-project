@@ -27,16 +27,18 @@ public class HololensCameraCapture : MonoBehaviour
     private string response;
 
     //string host = "127.0.0.1";
+    //string port = "6000";
     public string host;
     public string port;
 
     byte[] imageBytes;
 
     public const int BufferSize = 16384; // you may need to adjust this size
-    private byte[] imageBuffer = new byte[BufferSize];
+    private byte[] imageBuffer;
     private int imageBufferOffset = 0;
 
     private int accumulator = 0;
+    private int tour = 0;
 
     // Use this for initialization
     void Start()
@@ -172,10 +174,16 @@ public class HololensCameraCapture : MonoBehaviour
         // Segment image into chunks and send them
         for (int i = 0; i < imageBytes.Length; i += BufferSize)
         {
+            tour += 1;
+
             // Calculate chunk size (last chunk can be smaller)
             int chunkSize = Mathf.Min(BufferSize, imageBytes.Length - i);
 
-            Debug.Log("chunkSize" + chunkSize);
+            Debug.Log(tour);
+            Debug.Log("Rest : " + (imageBytes.Length - i).ToString());
+            Debug.Log("Chunk Size : " + chunkSize.ToString());
+
+            imageBuffer = new byte[chunkSize];
 
             // Copy chunk into buffer
             Array.Copy(imageBytes, i, imageBuffer, 0, chunkSize);
@@ -213,9 +221,6 @@ public class HololensCameraCapture : MonoBehaviour
         stream.Write(sendBytes, 0, sendBytes.Length);
 
         accumulator += BufferSize;
-
-        Debug.Log("Image chunk sent. Length: " + imageBufferOffset);
-        Debug.Log("Rest: " + (imageBytes.Length - accumulator));
     }
 
     IEnumerator WaitForResponse()

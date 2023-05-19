@@ -22780,8 +22780,6 @@ MonoBehaviour:
   ipInput: {fileID: 1735074402}
   portInputField: {fileID: 987821286}
   sendOnlyImage: 0
-  host: 
-  port: 0
 --- !u!4 &1388759492
 Transform:
   m_ObjectHideFlags: 0
