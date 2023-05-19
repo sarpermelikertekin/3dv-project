@@ -142,6 +142,7 @@ public class HololensCameraCapture : MonoBehaviour
             // Activate the camera
             photoCaptureObject.StartPhotoModeAsync(cameraParameters, delegate (PhotoCapture.PhotoCaptureResult result)
             {
+                Debug.Log("Picture Taken");
                 StartCoroutine(CaptureAndSendImage());
             });
         });
@@ -206,10 +207,21 @@ public class HololensCameraCapture : MonoBehaviour
         // Prepend the size of the entire image
         byte[] imageSizeBytes = BitConverter.GetBytes(imageBytes.Length);
 
-        byte[] sendBytes = new byte[packageSizeBytes.Length + imageSizeBytes.Length + imageBufferOffset];
-        packageSizeBytes.CopyTo(sendBytes, 0);
-        imageSizeBytes.CopyTo(sendBytes, packageSizeBytes.Length);
-        imageBuffer.CopyTo(sendBytes, packageSizeBytes.Length + imageSizeBytes.Length);
+        int totalSize = packageSizeBytes.Length + imageSizeBytes.Length + imageBufferOffset;
+
+        byte[] sendBytes = new byte[totalSize];
+
+        if (imageBuffer.Length <= totalSize - (packageSizeBytes.Length + imageSizeBytes.Length))
+        {
+            packageSizeBytes.CopyTo(sendBytes, 0);
+            imageSizeBytes.CopyTo(sendBytes, packageSizeBytes.Length);
+            imageBuffer.CopyTo(sendBytes, packageSizeBytes.Length + imageSizeBytes.Length);
+        }
+        else
+        {
+            Debug.LogError("Buffer overflow detected. Unable to copy imageBuffer to sendBytes.");
+            return; // you might want to handle this case differently
+        }
 
         if (client == null)
         {
