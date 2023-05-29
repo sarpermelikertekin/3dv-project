@@ -66,8 +66,8 @@ def trainTestSplit(stablepath, targetpath, datasetSize, ratio = 0.85):
     targetTrainLabel = targetpath + "labels/train/"
     targetValLabel = targetpath + "labels/val/"
     for i in range(datasetSize):
-        pathImg = "Data Point " + str(i) +".png"
-        pathTxt = "Data Point " + str(i) +".txt"
+        pathImg = "images" + str(i) +".png"
+        pathTxt = "images" + str(i) +".txt"
         if i in valIndex:
             shutil.copyfile(stablepath + pathImg, targetValImg + pathImg)
             shutil.copyfile(stablepath + pathTxt, targetValLabel + pathTxt)
@@ -78,11 +78,11 @@ def trainTestSplit(stablepath, targetpath, datasetSize, ratio = 0.85):
         
 relative = './convert_to_yolo/'
 textpath = 'imagefile.txt'
-stablepath = './DataPoints/'
-targetpath = './DataPointsFinal/'
-datasetSize = 3000
+stablepath = '../Dataset_3DVision/real_img_dataset/'
+targetpath = '../Dataset_3DVision/RealDataPoints/'
+datasetSize = 134
 #iterateTextfile(textpath, stablepath, datasetSize)
-trainTestSplit(stablepath, targetpath, datasetSize, 0.85)
+trainTestSplit(stablepath, targetpath, datasetSize, 0.9)
 
 #print(os.listdir(folderpath))
 

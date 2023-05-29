@@ -1,83 +1,42 @@
-#from flask import Flask
-import os
-import torch
-import cv2
-import numpy as np
 import socket
-import struct
-import time
+import sys
 
+# Server IP address and port
+server_ip = ''
+server_port = 5200
 
+# Create a TCP socket
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-def run():
-    
+try:
+    # Bind the socket to the server IP address and port
+    server_socket.bind((server_ip, server_port))
 
-    #HOST = 'localhost'
-    HOST = ''
-    PORT = 6000
+    # Listen for incoming connections
+    server_socket.listen(1)
+    print('Server listening on {}:{}'.format(server_ip, server_port))
 
-    # Create a socket and bind it to the host and port
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((HOST, PORT))
-        s.listen(1)
-        print(f"Waiting for a connection on {HOST}:{PORT}")
+    # Accept a client connection
+    client_socket, client_address = server_socket.accept()
+    print('Client connected:', client_address)
 
-        # Accept a connection from a client
-        conn, addr = s.accept()
-        print(f"Connected to {addr}")
+    # Receive the image data
+    image_data = b''
+    while True:
+        data = client_socket.recv(4096)
+        if not data:
+            break
+        image_data += data
 
-        # Loop to receive images from the client
-        while True:
-            # Receive the length-prefixed image data
-            length_data = conn.recv(4)
-            if not length_data:
-                print("Connection closed by client")
-                break
-            length = struct.unpack("I", length_data)[0]
-            print(f"Expected length: {length}")
-            data = conn.recv(length)
-            if not data:
-                break
+    # Save the received image
+    with open('received_image.png', 'wb') as file:
+        file.write(image_data)
+    print('Image received and saved as received_image.png')
 
-            # Decode the image data and display the image
-            nparr = np.frombuffer(data, np.uint8)
-            print(nparr.shape)
-            
-            try:
-                img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-                #cv2.imshow("receive", img)
-                cv2.imwrite(image_path, img, [int(cv2.IMWRITE_PNG_COMPRESSION),0])  
-                print("Image received")
-                #cv2.waitKey(1)
-            except Exception as e:
-                print("Error decoding image:", e)
-            
+except Exception as e:
+    print('Error: {}'.format(e))
 
-            results = model(image_path)
-            objects = results.pandas().xyxy  #this is a dataframe
-            print("Image processed")
-            print(str(objects))
-                
-                    
-            # Send the length of the received image data back to the client
-            conn.send(str(objects).encode())
-            #conn.send(str(0).encode())
-
-            print("Response sent")
-            time.sleep(1.0)
-            
-        # Release resources and close the connection
-        cv2.destroyAllWindows()
-        conn.close()
-        print("Connection closed")
-
-
-
-
-
-weights_path = './models/best6.pt'
-image_path = './image6.png'
-model = torch.hub.load('ultralytics/yolov5', 'custom', weights_path)
-
-run()
-
+finally:
+    # Close the client connection and the server socket
+    client_socket.close()
+    server_socket.close()
