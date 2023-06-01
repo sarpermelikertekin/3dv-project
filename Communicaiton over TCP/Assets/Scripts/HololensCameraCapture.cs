@@ -7,7 +7,7 @@ using UnityEngine;
 public class PythonClient : MonoBehaviour
 {
     // Server IP address and port
-    public string serverIP = "77.109.166.99";
+    public string serverIP = "77.109.166.37";
     public int serverPort = 5200;
 
     private TcpClient client;
