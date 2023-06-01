@@ -5,6 +5,7 @@ using UnityEngine.Windows.WebCam;
 using UnityEngine.UI;
 using System.Net.Sockets;
 using System;
+using System.Net;
 using TMPro;
 
 public class HololensCameraCapture : MonoBehaviour
@@ -22,6 +23,9 @@ public class HololensCameraCapture : MonoBehaviour
 
     public bool sendOnlyImage;
     private TcpClient client;
+    private UdpClient client_u;
+
+    private IPEndPoint endPoint;
     private NetworkStream stream;
     private bool isWaitingForResponse = false;
     private string response;
@@ -33,7 +37,7 @@ public class HololensCameraCapture : MonoBehaviour
 
     byte[] imageBytes;
 
-    public const int BufferSize = 16384; // you may need to adjust this size
+    public const int BufferSize = 400000; // you may need to adjust this size
     private byte[] imageBuffer;
     private int imageBufferOffset = 0;
 
@@ -172,94 +176,50 @@ public class HololensCameraCapture : MonoBehaviour
         // Encode the texture as a PNG image
         imageBytes = targetTexture.EncodeToPNG();
 
-        // Segment image into chunks and send them
-        for (int i = 0; i < imageBytes.Length; i += BufferSize)
-        {
-            tour += 1;
-
-            // Calculate chunk size (last chunk can be smaller)
-            int chunkSize = Mathf.Min(BufferSize, imageBytes.Length - i);
-
-            Debug.Log(tour);
-            Debug.Log("Rest : " + (imageBytes.Length - i).ToString());
-            Debug.Log("Chunk Size : " + chunkSize.ToString());
-
-            imageBuffer = new byte[chunkSize];
-
-            // Copy chunk into buffer
-            Array.Copy(imageBytes, i, imageBuffer, 0, chunkSize);
-            imageBufferOffset = chunkSize;
-
-            // Send buffer
-            SendBuffer();
-
-            // Wait for a response from the server
-            isWaitingForResponse = true;
-            StartCoroutine(WaitForResponse());
-        }
-    }
-
-    private void SendBuffer()
-    {
-        // Prepend the size of the package (i.e., imageBufferOffset)
-        byte[] packageSizeBytes = BitConverter.GetBytes(imageBufferOffset);
-
-        // Prepend the size of the entire image
-        byte[] imageSizeBytes = BitConverter.GetBytes(imageBytes.Length);
-
-        int totalSize = packageSizeBytes.Length + imageSizeBytes.Length + imageBufferOffset;
-
-        byte[] sendBytes = new byte[totalSize];
-
-        if (imageBuffer.Length <= totalSize - (packageSizeBytes.Length + imageSizeBytes.Length))
-        {
-            packageSizeBytes.CopyTo(sendBytes, 0);
-            imageSizeBytes.CopyTo(sendBytes, packageSizeBytes.Length);
-            imageBuffer.CopyTo(sendBytes, packageSizeBytes.Length + imageSizeBytes.Length);
-        }
-        else
-        {
-            Debug.LogError("Buffer overflow detected. Unable to copy imageBuffer to sendBytes.");
-            return; // you might want to handle this case differently
-        }
-
         if (client == null)
         {
-            client = new TcpClient(FindIPv4InString(host), FindNumberInString(port));
+            //client = new TcpClient(FindIPv4InString(host), FindNumberInString(port));
+            client = new TcpClient("172.20.10.2", 5000);
             stream = client.GetStream();
         }
 
-        // Send the length-prefixed image data over the network
-        stream.Write(sendBytes, 0, sendBytes.Length);
+        int frameSize = imageBytes.Length;
+        Debug.Log("received bytes: "+frameSize);
+        byte[] sizeBytes = new byte[4];
+        for(int i = 0; i<4; i++){
+            sizeBytes[i] = (byte)(frameSize>>((3-i)*8));
+        }
+        stream.Write(sizeBytes, 0, sizeBytes.Length);
+        stream.Write(imageBytes, 0, imageBytes.Length);
 
-        accumulator += BufferSize;
+        isWaitingForResponse = true;
+        StartCoroutine(WaitForResponse());
     }
+
+    
+
+    
 
     IEnumerator WaitForResponse()
     {
         byte[] responseBytes = new byte[1024];
         int bytesRead = 0;
+        
         while (bytesRead == 0)
         {
             if (stream.DataAvailable)
             {
                 bytesRead = stream.Read(responseBytes, 0, responseBytes.Length);
                 response = System.Text.Encoding.ASCII.GetString(responseBytes, 0, bytesRead);
-
-                // Check if server wants more data
-                if (response == "send more")
-                {
-                    // Reset buffer offset
-                    imageBufferOffset = 0;
-
-                    // Send the next chunk
-                    SendBuffer();
-                }
+                Debug.Log("Response received: " + response);
+                
             }
             yield return null;
         }
+        
         isWaitingForResponse = false;
         Debug.Log("Response received: " + response);
+        yield return null;
     }
 
     void OnApplicationQuit()

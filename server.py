@@ -6,6 +6,7 @@ import numpy as np
 import struct ## new
 import zlib
 import time
+import torch
 
 
 
@@ -51,21 +52,26 @@ def main():
         frame_data = receive_frame(client_socket, frame_size)
 
         # Process the received frame as needed
-        with open('received_frame.jpg', 'wb') as f:
+        with open(image_path, 'wb') as f:
             f.write(frame_data)
 
         print('Frame received successfully!')
 
-        # Close the client socket
-        client_socket.send("Image received".encode())
-        #print('sleep')
-        #time.sleep(0.1)
+        results = model(image_path)
+        objects = results.pandas().xyxy 
+        print(objects)
+        
+        client_socket.send(str(objects).encode())
     
     
+    #maybe put a condition here
     client_socket.close()
 
     # Close the server socket
     server_socket.close()
 
 
+image_path = 'received_frame.jpg'
+weights_path = './training results/exp_16052023_1426/weights/best.pt'
+model = torch.hub.load('ultralytics/yolov5', 'custom', weights_path)
 main()
