@@ -29,6 +29,16 @@ def receive_frame(client_socket, frame_size):
 
     return frame_data
 
+def prepare_str(objects):
+    response = ""
+    first = True
+    for line in objects.splitlines():
+        if first:
+            first = False
+            continue
+        response += line + "; \n"
+    return response
+
 
 def main():
     server_ip = ''  # Change this to your server IP
@@ -58,10 +68,10 @@ def main():
         print('Frame received successfully!')
 
         results = model(image_path)
-        objects = results.pandas().xyxy 
-        print(objects)
+        objects = results.pandas().xyxy[0].to_csv() 
+        response = prepare_str(objects)
         
-        client_socket.send(str(objects).encode())
+        client_socket.send(response.encode())
     
     
     #maybe put a condition here
