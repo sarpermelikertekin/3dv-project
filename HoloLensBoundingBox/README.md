@@ -1,9 +1,9 @@
 # HoloLensBoundingBox (Unity app)
 
 This repo is based on [**HoloLensCameraStream for Unity**](https://github.com/EnoxSoftware/HoloLensCameraStream). The original repository provides Unity plugin for mapping image pixel coordinate from the HoloLens video camera to 3D coordinate. In this repo, we present a Unity app that 
-1. display in real-time what the hololens sees, i.e. HoloLens video stream;
-2. convert bounding box specified in image pixel coordinate system to bounding box in HoloLens world coordinate system;
-3. display the bounding box on top of the HoloLens video stream.
+1. displays in real-time what the hololens sees, i.e. HoloLens video stream;
+2. converts bounding box specified in image pixel coordinate system to bounding box in HoloLens world coordinate system;
+3. displays the bounding box on top of the HoloLens video stream.
 
 ## Getting Started
 The tutorial below will show you how to **Build and deploy the Unity app**.
