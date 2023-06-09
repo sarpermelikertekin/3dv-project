@@ -1,0 +1,13 @@
+train: ../DataPoints/images/train  # dataset root dir
+val: ../DataPoints/images/val  ##for validation local
+# training icin train pathinin vallisini verirsin colabde
+
+nc: 5
+
+# Classes
+names:
+  0: Screw1
+  1: Screw2
+  2: Screw3
+  3: Screw4
+  4: Screw5
