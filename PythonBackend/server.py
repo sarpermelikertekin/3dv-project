@@ -43,8 +43,7 @@ def prepare_str(objects):
 
 
 def main():
-    server_ip = ''  # listen from any ip
-    server_port = 5000  # Change this to your server port
+    
 
     # Create a TCP socket server
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -86,7 +85,8 @@ def main():
     # Close the server socket
     server_socket.close()
 
-
+server_ip = ''  # listen from any ip
+server_port = 5000  
 image_path = 'received_frame.jpg'
 weights_path = './training results/exp_30052023_1738/weights/best.pt'
 model = torch.hub.load('ultralytics/yolov5', 'custom', weights_path)
