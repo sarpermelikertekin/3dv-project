@@ -352,48 +352,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5457185079912393290, guid: fee26d4eb02f52b4eb197afd4aa3758d, type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 128d50a0637602541875bcd662974dc3, type: 2}
     - target: {fileID: 8383226845335192857, guid: fee26d4eb02f52b4eb197afd4aa3758d, type: 3}
       propertyPath: m_Name
       value: Bones and Implants
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fee26d4eb02f52b4eb197afd4aa3758d, type: 3}
---- !u!1 &8366434398692668388 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8383226845335192857, guid: fee26d4eb02f52b4eb197afd4aa3758d, type: 3}
-  m_PrefabInstance: {fileID: 8366434398692668387}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &8366434398692668389
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8366434398692668388}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 24fe63d00311af54f9050cf2dd7a7fdc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  med: {fileID: 8366434398692668391}
-  lat: {fileID: 8366434398692668390}
-  highlightedColor: {fileID: 2100000, guid: d2e687739de76bc42ad3c22f0f198299, type: 2}
-  implantColor: {fileID: 2100000, guid: 128d50a0637602541875bcd662974dc3, type: 2}
-  implantNames: []
-  buffer1: []
-  buffer2: []
-  input: 
---- !u!1 &8366434398692668390 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6562284489833149331, guid: fee26d4eb02f52b4eb197afd4aa3758d, type: 3}
-  m_PrefabInstance: {fileID: 8366434398692668387}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &8366434398692668391 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3242427808271721647, guid: fee26d4eb02f52b4eb197afd4aa3758d, type: 3}
-  m_PrefabInstance: {fileID: 8366434398692668387}
-  m_PrefabAsset: {fileID: 0}

@@ -28,12 +28,10 @@ public class ImplantManager : MonoBehaviour
         lat.GetComponent<MeshRenderer>().material = implantColor;
 
         buffer1 = input.Split(";");
-        Debug.Log(buffer1);
         for (int i = 0; i < buffer1.Length - 1; i++)
         {
             buffer2 = buffer1[i].Split(",");
             implantNames.Add(buffer2[buffer2.Length - 1]);
-            Debug.Log(implantNames);
         }
 
         if (implantNames.Contains("FracturePlate_1x_MedScrewCut1"))

@@ -30,6 +30,9 @@ public class HololensCameraCapture : MonoBehaviour
     private bool isWaitingForResponse = false;
     private string response;
 
+    public GameObject bonesAndImplants;
+    public ImplantManager implantManager;
+
     //string host = "127.0.0.1";
     //string port = "6000";
     public string host;
@@ -47,7 +50,7 @@ public class HololensCameraCapture : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-
+        implantManager = bonesAndImplants.GetComponent<ImplantManager>();
     }
 
     public void AdjustUI()
@@ -178,8 +181,8 @@ public class HololensCameraCapture : MonoBehaviour
 
         if (client == null)
         {
-            //client = new TcpClient(FindIPv4InString(host), FindNumberInString(port));
-            client = new TcpClient("172.20.10.2", 5000);
+            client = new TcpClient(FindIPv4InString(host), FindNumberInString(port));
+            //client = new TcpClient("10.5.181.95", 6000);
             stream = client.GetStream();
         }
 
@@ -212,6 +215,7 @@ public class HololensCameraCapture : MonoBehaviour
                 bytesRead = stream.Read(responseBytes, 0, responseBytes.Length);
                 response = System.Text.Encoding.ASCII.GetString(responseBytes, 0, bytesRead);
                 Debug.Log("Response received: " + response);
+                implantManager.input = response;
                 
             }
             yield return null;
@@ -219,6 +223,7 @@ public class HololensCameraCapture : MonoBehaviour
         
         isWaitingForResponse = false;
         Debug.Log("Response received: " + response);
+        implantManager.input = response;
         yield return null;
     }
 
