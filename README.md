@@ -47,8 +47,8 @@ The example Unity project can be found in the root `HoloLensVideoCaptureExample/
 
 ## Off Device ML (Python)
 
-1. **Run server.py under PythonBackend:** It runs the server in which the Yolo model is prepared for inference. Then it starts listening images from Hololens. Assuming the IP address of the server and correct port is entered in Hololens, the communication will be established. Then the images are read in chunks and reconstructed in a file. The image in the file is passed to Yolo model, and model returns the list of detected objects and their coordinates and labels. The model response is sent back to Hololens. This loop goes on until the program terminates from Hololens side. 
-2. **Customize parameters:** Port number, path of images, and path to the weights being used in Yolo model can be arranged in server.py.  
+1. **Run `server.py` under PythonBackend:** It runs the server in which the Yolo model is prepared for inference. Then it starts listening images from Hololens. Assuming the IP address of the server and correct port is entered in Hololens, the communication will be established. Then the images are read in chunks and reconstructed in a file. The image in the file is passed to Yolo model, and model returns the list of detected objects and their coordinates and labels. The model response is sent back to Hololens. This loop goes on until the program terminates from Hololens side. 
+2. **Customize parameters:** Port number, path of images, and path to the weights being used in Yolo model can be arranged in `server.py`.  
 
 **! Caution: Server should run before the connect button in Hololens App is pressed.**
 
