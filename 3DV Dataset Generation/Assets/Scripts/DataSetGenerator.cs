@@ -12,6 +12,9 @@ public class DataSetGenerator : MonoBehaviour
     RandomTranslator randomTranslator;
     RandomScalor randomScalor;
 
+    public KeyCode startingKey;
+    public bool saveOutsideOfTheApp;
+    public string outputFileLocation;
 
     public GameObject[] implants;
     public List<GameObject> active_implants;
@@ -42,7 +45,7 @@ public class DataSetGenerator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.A))
+        if (Input.GetKeyDown(startingKey))
         {
             StartCoroutine(StartGeneratingDataSet(dataPointWaitTime));
         }
@@ -90,7 +93,15 @@ public class DataSetGenerator : MonoBehaviour
 
     public void WriteToFile(string fileName, string textToWrite)
     {
-        string path = Path.Combine(Application.dataPath, fileName);
+        string path = "";
+        if (!saveOutsideOfTheApp)
+        {
+            path = Path.Combine(Application.dataPath, fileName);
+        }
+        else 
+        {
+            path = Path.Combine(outputFileLocation, fileName);
+        }
         File.WriteAllText(path, textToWrite);
     }
 
